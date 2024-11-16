@@ -1,0 +1,51 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+.register-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+
+}
+
+.register-header {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.register-form > form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.register-form input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+}
+
+.register-form button {
+    padding: 12px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff; /* синій фон */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
