@@ -102,6 +102,18 @@ def verify_user_credentials(email, password):
     finally:
         session.close()
 
+def get_user_by_email(email):
+    """Отримує користувача за його email."""
+    session = Session()
+    try:
+        # Отримуємо користувача по email
+        user = session.query(User).filter(User.email == email).first()
+        return user
+    except Exception as e:
+        print(f"Error getting user by email: {e}")
+        return None
+    finally:
+        session.close()
 
 # Function for adding a chat
 def add_chat(user1_id, user2_id):
@@ -137,12 +149,19 @@ def add_message(chat_id, sender_id, content):
 
 # Function to get all user chats
 def get_chats(user_id):
-    """Get all chats for a user."""
+    """Get all chats for a user and include the username of the other user."""
     session = Session()
     try:
         chats = session.query(Chat).filter(
             (Chat.user1_id == user_id) | (Chat.user2_id == user_id)
         ).all()
+        
+        # Додаємо username другого користувача до кожного чату
+        for chat in chats:
+            if chat.user1_id != user_id:
+                chat.other_username = session.query(User.username).filter(User.id == chat.user1_id).first().username
+            else:
+                chat.other_username = session.query(User.username).filter(User.id == chat.user2_id).first().username
         return chats
     except Exception as e:
         print(f"Error fetching chats: {e}")
@@ -150,6 +169,18 @@ def get_chats(user_id):
     finally:
         session.close()
 
+def get_chat_by_id(chat_id):
+    """Отримує чат за його ID."""
+    session = Session()
+    try:
+        # Отримуємо чат з відповідними повідомленнями
+        chat = session.query(Chat).filter(Chat.id == chat_id).first()
+        return chat
+    except Exception as e:
+        print(f"Error getting chat by ID: {e}")
+        return None
+    finally:
+        session.close()
 
 # Function to receive notifications from a specific chat
 def get_messages(chat_id):
