@@ -56,7 +56,7 @@ def chats():
     chat_id = request.args.get('chat_id')
     selected_chat = None
     if chat_id:
-        selected_chat = get_chat_by_id(chat_id)
+        selected_chat = get_chat_by_id(chat_id, user_id)
 
     return render_template('chat.html', username=username, chats=chats, selected_chat=selected_chat)
 
