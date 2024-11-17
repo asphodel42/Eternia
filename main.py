@@ -6,8 +6,9 @@ app = Flask(__name__)
 app.secret_key = 'c5f1b80dc09eec32d894056b983790d5eeeb1338f07c9334c8cd57a67932726a'
 bcrypt = Bcrypt(app)
 
-# Ініціалізація бази даних
-init_db()
+@app.route('/')
+def index():
+    return redirect(url_for('register'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -42,4 +43,5 @@ def login():
     return render_template('login.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    init_db()
+    app.run(host='localhost', port=5000,debug=True)
