@@ -1,0 +1,77 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Загальні стилі */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7fa; /* світло-сірий фон */
+    color: #333;
+}
+
+/* Блок входу */
+.login-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px; /* максимальна ширина форми */
+}
+
+/* Заголовок форми */
+.login-header {
+    font-size: 24px;
+    font-weight: bold;
+    color: #007bff; /* синій колір для заголовка */
+    margin-bottom: 20px;
+}
+
+/* Форма */
+.login-form > form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+}
+
+/* Поля вводу */
+.login-form input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+}
+
+/* Кнопка */
+.login-form button {
+    padding: 12px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff; /* синій фон */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Лінк для переходу на сторінку реєстрації */
+.login-form .register-link {
+    text-align: center;
+    font-size: 14px;
+    color: #007bff;
+    text-decoration: none;
+    margin-top: 15px;
+}
+
+.login-form .register-link:hover {
+    text-decoration: underline;
+}
