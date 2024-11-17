@@ -1,8 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime
-from sqlalchemy.orm import relationship, sessionmaker
-from flask import Flask
+from sqlalchemy.orm import relationship, sessionmaker, joinedload
 import datetime
 
 # Ініціалізація об'єктів SQLAlchemy та Bcrypt
@@ -169,15 +168,24 @@ def get_chats(user_id):
     finally:
         session.close()
 
-def get_chat_by_id(chat_id):
-    """Отримує чат за його ID."""
+def get_chat_by_id(chat_id, current_user_id):
+    """Get a chat by ID and include the username of the other user."""
     session = Session()
     try:
-        # Отримуємо чат з відповідними повідомленнями
-        chat = session.query(Chat).filter(Chat.id == chat_id).first()
+        # Використовуємо joinedload для підвантаження повідомлень
+        chat = session.query(Chat).filter(Chat.id == chat_id).options(joinedload(Chat.messages)).first()
+        if chat:
+            # Визначаємо ID іншого користувача
+            other_user_id = chat.user1_id if chat.user2_id == current_user_id else chat.user2_id
+            
+            # Отримуємо username іншого користувача
+            other_user = session.query(User).filter(User.id == other_user_id).first()
+            if other_user:
+                chat.other_username = other_user.username  # Додаємо username співрозмовника до об'єкта chat
+            
         return chat
     except Exception as e:
-        print(f"Error getting chat by ID: {e}")
+        print(f"Error fetching chat by id: {e}")
         return None
     finally:
         session.close()

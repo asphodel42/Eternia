@@ -41,7 +41,8 @@ body {
 
 .chat-items {
     list-style-type: none;
-    padding-left: 0;
+    margin: 0;
+    padding: 0;
 }
 
 .chat-item {
@@ -56,6 +57,20 @@ body {
     background-color: #f0f0f0;
 }
 
+.chat-link {
+    display: block;
+    padding: 10px;
+    background-color: #f3f3f3;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.3s ease;
+}
+
+.chat-link:hover {
+    background-color: #e0e0e0; /* Колір при наведенні */
+}
+
 .chat-window {
     flex-grow: 1;
     display: flex;
@@ -68,8 +83,8 @@ body {
     align-items: center;
     padding: 10px 20px;
     background-color: #e5e5e5;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 .chat-header-left .username {
@@ -79,10 +94,10 @@ body {
 
 .chat-header-right .profile-link {
     font-size: 14px;
-    color: #007bff;
+    color: #575c62;
     cursor: pointer;
-    text-decoration: underline;
-}
+    text-decoration: none;
+  }
 
 .chat-messages {
     flex-grow: 1;
