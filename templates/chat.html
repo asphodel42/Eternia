@@ -16,7 +16,7 @@
             <ul class="chat-items">
                 {% for chat in chats %}
                     <li class="chat-item">
-                        <a href="{{ url_for('chats', chat_id=chat.id) }}">
+                        <a href="{{ url_for('chats', chat_id=chat.id) }}" class="chat-link">
                             <span>{{ chat.other_username }}</span>
                         </a>
                     </li>
@@ -35,7 +35,7 @@
             {% if selected_chat %}
                 <div class="chat-header">
                     <div class="chat-header-left">
-                        <span class="username">{{ selected_chat.username }}</span>
+                        <span class="username">{{ selected_chat.other_username }}</span>
                     </div>
                     <div class="chat-header-right">
                         <span class="profile-link">View Profile</span>
