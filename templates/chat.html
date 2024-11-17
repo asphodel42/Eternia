@@ -14,57 +14,53 @@
                 <input type="text" placeholder="Search chats...">
             </div>
             <ul class="chat-items">
-                <!-- Список чатів (Динамічно генерується через сервер або JavaScript) -->
-                <li class="chat-item">
-                    <span>John Doe</span>
-                </li>
-                <li class="chat-item">
-                    <span>Jane Smith</span>
-                </li>
-                <li class="chat-item">
-                    <span>Mark Spencer</span>
-                </li>
-                <!-- Додати інші чати -->
+                {% for chat in chats %}
+                    <li class="chat-item">
+                        <a href="{{ url_for('chats', chat_id=chat.id) }}">
+                            <span>{{ chat.other_username }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
             </ul>
             <!-- Профіль користувача (ліво внизу) -->
             <div class="user-profile">
-                <!-- <div class="profile-img">
-                    <img src="profile-pic.jpg" alt="Profile Picture">
-                </div> -->
                 <div class="profile-info">
-                    <h4>Asphodel</h4>
+                    <h4>{{ username }}</h4>
                 </div>
             </div>
         </div>
 
         <!-- Центральна і права частина: Вікно чату -->
         <div class="chat-window">
-            <div class="chat-header">
-                <div class="chat-header-left">
-                    <span class="username">John Doe</span>
+            {% if selected_chat %}
+                <div class="chat-header">
+                    <div class="chat-header-left">
+                        <span class="username">{{ selected_chat.username }}</span>
+                    </div>
+                    <div class="chat-header-right">
+                        <span class="profile-link">View Profile</span>
+                    </div>
                 </div>
-                <div class="chat-header-right">
-                    <span class="profile-link">View Profile</span>
-                </div>
-            </div>
 
-            <div class="chat-messages">
-                <!-- Повідомлення чату -->
-                <div class="message received">
-                    <span class="message-text">Hi, how are you?</span>
+                <div class="chat-messages">
+                    <!-- Повідомлення чату -->
+                    {% for message in selected_chat.messages %}
+                        <div class="message {% if message.sender_id == user.id %}sent{% else %}received{% endif %}">
+                            <span class="message-text">{{ message.content }}</span>
+                        </div>
+                    {% endfor %}
                 </div>
-                <div class="message sent">
-                    <span class="message-text">I'm good, thanks! How about you?</span>
-                </div>
-                <!-- Інші повідомлення -->
-            </div>
 
-            <!-- Поле для вводу повідомлення -->
-            <div class="chat-input">
-                <textarea placeholder="Type a message..."></textarea>
-                <button class="send-btn">Send</button>
-            </div>
+                <!-- Поле для вводу повідомлення -->
+                <div class="chat-input">
+                    <textarea placeholder="Type a message..."></textarea>
+                    <button class="send-btn">Send</button>
+                </div>
+            {% else %}
+                <p>Select a chat to start messaging.</p>
+            {% endif %}
         </div>
     </div>
+    <script src="../static/js/chat.js"></script>
 </body>
 </html>
