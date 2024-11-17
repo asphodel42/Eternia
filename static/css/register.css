@@ -78,3 +78,30 @@ body {
 .register-form .login-link:hover {
     text-decoration: underline;
 }
+
+.flashes {
+    position: absolute;
+    width: 100%;
+    list-style-type: none;
+    padding: 0;
+    margin: 0 0 10px 0;
+}
+
+.flashes li {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.flashes .success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.flashes .danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
