@@ -50,8 +50,6 @@ def chats():
     user_id = session['user_id']
     username = session['username']
     chats = get_chats(user_id)
-    print(user_id)
-    print(chats)
 
     chat_id = request.args.get('chat_id')
     selected_chat = None
@@ -67,15 +65,32 @@ def chat(chat_id):
         return redirect(url_for('login'))
     
     user_id = session['user_id']
-    chat = get_chat_by_id(chat_id)  # Отримуємо чат по id
-    messages = get_messages(chat_id)  # Отримуємо повідомлення для чату
+    chat = get_chat_by_id(chat_id)
+    messages = get_messages(chat_id)
 
     if request.method == 'POST':
         message_text = request.form['message']
-        add_message(user_id, chat_id, message_text)  # Створюємо нове повідомлення
+        add_message(user_id, chat_id, message_text)
         return redirect(url_for('chat', chat_id=chat_id))
 
     return render_template('chat.html', chat=chat, messages=messages, chats=get_chats(user_id))
+
+@app.route('/send_message', methods=['POST'])
+def send_message():
+    if 'user_id' not in session:
+        return {'error': 'Unauthorized'}, 401
+
+    data = request.get_json()
+    chat_id = data.get('chat_id')
+    message_text = data.get('message')
+
+    if not chat_id or not message_text:
+        return {'error': 'Invalid data'}, 400
+
+    user_id = session['user_id']
+    add_message(user_id, chat_id, message_text)
+
+    return {'success': True}, 200
 
 if __name__ == '__main__':
     init_db()
