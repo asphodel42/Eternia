@@ -114,6 +114,17 @@ def get_user_by_email(email):
     finally:
         session.close()
 
+def get_user_by_id(user_id):
+    """Отримання користувача за ID."""
+    session = Session()
+    try:
+        return session.query(User).filter_by(id=user_id).first()
+    except Exception as e:
+        print(f"Error retrieving user by ID: {e}")
+        return None
+    finally:
+        session.close()
+
 # Function for adding a chat
 def add_chat(user1_id, user2_id):
     """Add a chat between two users if it doesn't exist."""

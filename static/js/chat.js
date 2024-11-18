@@ -131,3 +131,26 @@ socket.on('new_message', function (data) {
     }
 });
 
+socket.on('new_chat', function (data) {
+    console.log('New chat received', data);
+
+    if (data.chat_id && data.other_username) {
+        const chatItem = document.createElement('li');
+        chatItem.classList.add('chat-item');
+
+        const chatLink = document.createElement('a');
+        chatLink.href = `/chats?chat_id=${data.chat_id}`;
+        chatLink.classList.add('chat-link');
+
+        const span = document.createElement('span');
+        span.textContent = data.other_username;
+
+        // Додаємо елемент в список
+        chatLink.appendChild(span);
+        chatItem.appendChild(chatLink);
+
+        // Додаємо новий чат в список
+        const chatList = document.querySelector('.chat-items');
+        chatList.appendChild(chatItem);
+    }
+});
