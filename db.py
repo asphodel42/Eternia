@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship, sessionmaker, joinedload
-import datetime
+from datetime import datetime
 
 # Ініціалізація об'єктів SQLAlchemy та Bcrypt
 db = SQLAlchemy()
@@ -56,7 +56,7 @@ class Message(Base):
     chat_id = Column(Integer, ForeignKey('chats.id'), nullable=False)
     sender_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     content = Column(String(500), nullable=False)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    timestamp = Column(DateTime, default=datetime.utcnow)
 
     def __init__(self, chat_id, sender_id, content):
         self.chat_id = chat_id
@@ -131,17 +131,16 @@ def add_chat(user1_id, user2_id):
 
 
 # Function to add a message to the chat
-def add_message(chat_id, sender_id, content):
-    """Add a message to the chat."""
+def add_message(user_id, chat_id, text):
+    """Add a message to the database."""
     session = Session()
     try:
-        new_message = Message(chat_id=chat_id, sender_id=sender_id, content=content)
-        session.add(new_message)
+        message = Message(sender_id=user_id, chat_id=chat_id, content=text)
+        session.add(message)
         session.commit()
-        return True
     except Exception as e:
         print(f"Error adding message: {e}")
-        return False
+        session.rollback()
     finally:
         session.close()
 
@@ -196,6 +195,7 @@ def get_messages(chat_id):
     session = Session()
     try:
         messages = session.query(Message).filter_by(chat_id=chat_id).order_by(Message.timestamp.asc()).all()
+        print(messages)
         return messages
     except Exception as e:
         print(f"Error fetching messages: {e}")

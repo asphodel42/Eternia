@@ -1,8 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_socketio import SocketIO, emit, join_room
 from db import init_db, create_user, verify_user_credentials, get_user_by_email, get_chats, add_message, get_messages, get_chat_by_id
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'c5f1b80dc09eec32d894056b983790d5eeeb1338f07c9334c8cd57a67932726a'
+socketio = SocketIO(app)
 
 @app.route('/')
 def index():
@@ -50,8 +53,6 @@ def chats():
     user_id = session['user_id']
     username = session['username']
     chats = get_chats(user_id)
-    print(user_id)
-    print(chats)
 
     chat_id = request.args.get('chat_id')
     selected_chat = None
@@ -61,22 +62,49 @@ def chats():
     return render_template('chat.html', username=username, chats=chats, selected_chat=selected_chat)
 
 
-@app.route('/chat/<int:chat_id>', methods=['GET', 'POST'])
+@app.route('/chat/<int:chat_id>', methods=['GET'])
 def chat(chat_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
     user_id = session['user_id']
-    chat = get_chat_by_id(chat_id)  # Отримуємо чат по id
-    messages = get_messages(chat_id)  # Отримуємо повідомлення для чату
-
-    if request.method == 'POST':
-        message_text = request.form['message']
-        add_message(user_id, chat_id, message_text)  # Створюємо нове повідомлення
-        return redirect(url_for('chat', chat_id=chat_id))
+    chat = get_chat_by_id(chat_id)
+    messages = get_messages(chat_id)
 
     return render_template('chat.html', chat=chat, messages=messages, chats=get_chats(user_id))
 
+@app.route('/send_message', methods=['POST'])
+def send_message():
+    if 'user_id' not in session:
+        return {'error': 'Unauthorized'}, 401
+
+    data = request.get_json()
+    chat_id = data.get('chat_id')
+    message_text = data.get('message')
+
+    if not chat_id or not message_text:
+        return {'error': 'Invalid data'}, 400
+
+    user_id = session['user_id']
+    timestamp = datetime.now()  # Час відправки повідомлення
+    add_message(user_id, chat_id, message_text)
+
+    # Надіслати повідомлення всім у чаті, включаючи час
+    socketio.emit('new_message', {
+        'chat_id': chat_id, 
+        'message': message_text, 
+        'timestamp': timestamp.strftime('%H:%M'),
+        'sender_id': user_id
+    }, room=f'chat_{chat_id}')
+
+    return {'success': True}, 200
+
+@socketio.on('join')
+def on_join(data):
+    chat_id = data['chat_id']
+    join_room(f'chat_{chat_id}')
+    print(f'User joined room chat_{chat_id}')
+
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True)
+    socketio.run(app, debug=True)
