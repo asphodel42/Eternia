@@ -73,6 +73,26 @@ def chat(chat_id):
 
     return render_template('chat.html', chat=chat, messages=messages, chats=get_chats(user_id))
 
+@app.route('/api/chats', methods=['GET'])
+def api_chats():
+    if 'user_id' not in session:
+        return jsonify({'error': 'User not logged in'}), 403
+    
+    user_id = session['user_id']
+    
+    # Отримуємо чати користувача, включаючи останнє повідомлення
+    chats = get_chats(user_id)
+
+    # Формуємо дані для відповіді
+    chats_data = [{
+        'id': chat.id,  # Замість chat['id'] використовуємо chat.id
+        'other_username': chat.other_username,
+        'last_message_content': chat.last_message_content,
+        'last_message_time': chat.last_message_time,
+    } for chat in chats]
+
+    return jsonify({'chats': chats_data})
+
 @app.route('/send_message', methods=['POST'])
 def send_message():
     if 'user_id' not in session:
