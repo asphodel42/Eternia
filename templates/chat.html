@@ -22,7 +22,6 @@
                     </li>
                 {% endfor %}
             </ul>
-            <!-- Профіль користувача (ліво внизу) -->
             <div class="user-profile">
                 <div class="profile-info">
                     <h4>{{ username }}</h4>
@@ -33,13 +32,12 @@
         <!-- Центральна і права частина: Вікно чату -->
         <div class="chat-window">
             {% if selected_chat %}
+                <!-- Додаємо атрибут для user_id -->
+                <div id="userId" data-user-id="{{ session['user_id'] }}"></div>
                 <div id="chat-data" data-chat-id="{{ selected_chat.id }}"></div>
                 <div class="chat-header">
                     <div class="chat-header-left">
                         <span class="username">{{ selected_chat.other_username }}</span>
-                    </div>
-                    <div class="chat-header-right">
-                        <span class="profile-link">View Profile</span>
                     </div>
                 </div>
 
@@ -51,7 +49,6 @@
                         </div>
                     {% endfor %}
                 </div>
-                <!-- Поле для вводу повідомлення -->
                 <div class="chat-input">
                     <textarea id="messageInput" placeholder="Type a message..."></textarea>
                     <button id="sendButton" class="send-btn">Send</button>
@@ -61,6 +58,7 @@
             {% endif %}
         </div>
     </div>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <script src="../static/js/chat.js"></script>
 </body>
 </html>
