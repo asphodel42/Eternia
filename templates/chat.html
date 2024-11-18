@@ -11,7 +11,8 @@
         <!-- Ліва частина: Список чатів -->
         <div class="chat-list">
             <div class="search">
-                <input type="text" placeholder="Search chats...">
+                <input type="text" placeholder="Search chats or users...">
+                <div id="user-search-dropdown" class="dropdown"></div>
             </div>
             <ul class="chat-items">
                 {% for chat in chats %}

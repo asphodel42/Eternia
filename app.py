@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_socketio import SocketIO, emit, join_room
-from db import init_db, create_user, verify_user_credentials, get_user_by_email, get_chats, add_message, get_messages, get_chat_by_id
+from db import init_db, create_user, verify_user_credentials, get_user_by_email, get_chats, add_message, get_messages, get_chat_by_id, add_chat, search_users_by_name
 from datetime import datetime
 
 app = Flask(__name__)
@@ -104,6 +104,37 @@ def on_join(data):
     chat_id = data['chat_id']
     join_room(f'chat_{chat_id}')
     print(f'User joined room chat_{chat_id}')
+
+@app.route('/search_users', methods=['GET'])
+def search_users():
+    """Search users by query."""
+    query = request.args.get('query', '').strip()
+    user_id = session.get('user_id')
+
+    if not user_id or not query:
+        return jsonify({'error': 'Invalid request'}), 400
+
+    # Використовуємо функцію пошуку
+    users = search_users_by_name(query=query, exclude_user_id=user_id)
+
+    return jsonify(users), 200
+
+@app.route('/create_chat', methods=['POST'])
+def create_chat():
+    """Route to create a chat between two users."""
+    user_id = session.get('user_id')  # ID поточного користувача
+    target_user_id = request.json.get('target_user_id')  # ID іншого користувача
+
+    if not user_id or not target_user_id:
+        return jsonify({'error': 'Missing user IDs'}), 400
+
+    # Використовуємо функцію add_chat для створення або пошуку чату
+    chat_id = add_chat(user1_id=user_id, user2_id=target_user_id)
+
+    if chat_id:
+        return jsonify({'chat_id': chat_id}), 201  # Успішно створено або знайдено
+    else:
+        return jsonify({'error': 'Failed to create chat'}), 500
 
 if __name__ == '__main__':
     init_db()
