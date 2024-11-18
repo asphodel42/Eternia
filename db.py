@@ -168,9 +168,10 @@ def add_message(user_id, chat_id, text):
 
 # Function to get all user chats
 def get_chats(user_id):
-    """Get all chats for a user and include the username of the other user."""
+    """Get all chats for a user and include the username of the other user, sorted by the last message timestamp."""
     session = Session()
     try:
+        # Отримуємо всі чати для користувача
         chats = session.query(Chat).filter(
             (Chat.user1_id == user_id) | (Chat.user2_id == user_id)
         ).all()
@@ -181,7 +182,21 @@ def get_chats(user_id):
                 chat.other_username = session.query(User.username).filter(User.id == chat.user1_id).first().username
             else:
                 chat.other_username = session.query(User.username).filter(User.id == chat.user2_id).first().username
-        return chats
+
+            # Отримуємо останнє повідомлення для чату
+            last_message = session.query(Message).filter_by(chat_id=chat.id).order_by(Message.timestamp.desc()).first()
+
+            if last_message:
+                chat.last_message_time = last_message.timestamp
+                chat.last_message_content = last_message.content
+            else:
+                chat.last_message_time = None
+                chat.last_message_content = None
+
+        # Сортуємо чати за часом останнього повідомлення (від найновіших до найстаріших)
+        sorted_chats = sorted(chats, key=lambda chat: chat.last_message_time if chat.last_message_time else datetime.min, reverse=True)
+
+        return sorted_chats
     except Exception as e:
         print(f"Error fetching chats: {e}")
         return []

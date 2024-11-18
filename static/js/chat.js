@@ -1,3 +1,6 @@
+// Завантажуємо чати при завантаженні сторінки
+document.addEventListener('DOMContentLoaded', loadChats);
+
 document.querySelector('.search input').addEventListener('input', function () {
     var query = this.value.trim();
     if (query) {
@@ -95,6 +98,7 @@ document.getElementById('sendButton').addEventListener('click', function () {
         .then(response => {
             if (response.ok) {
                 messageInput.value = '';
+                loadChats();
             } else {
                 alert('Failed to send the message. Please try again.');
             }
@@ -128,12 +132,11 @@ socket.on('new_message', function (data) {
 
         chatMessages.appendChild(messageDiv);
         scrollToBottom();
+        loadChats();
     }
 });
 
 socket.on('new_chat', function (data) {
-    console.log('New chat received', data);
-
     if (data.chat_id && data.other_username) {
         const chatItem = document.createElement('li');
         chatItem.classList.add('chat-item');
@@ -152,5 +155,52 @@ socket.on('new_chat', function (data) {
         // Додаємо новий чат в список
         const chatList = document.querySelector('.chat-items');
         chatList.appendChild(chatItem);
+        loadChats();
     }
 });
+
+function loadChats() {
+    fetch('/api/chats')  // Запит до нового API маршруту
+        .then(response => response.json())
+        .then(data => {
+            const chats = data.chats;
+            const chatList = document.querySelector('.chat-items');
+            chatList.innerHTML = '';  // Очищаємо список чатів
+
+            // Додаємо чати в список
+            chats.forEach(chat => {
+                const chatItem = document.createElement('li');
+                chatItem.classList.add('chat-item');
+                chatItem.dataset.chatId = chat.id;  // Зберігаємо chat id в атрибуті
+
+                const chatLink = document.createElement('a');
+                chatLink.href = `/chats?chat_id=${chat.id}`;
+                chatLink.classList.add('chat-link');
+
+                const span = document.createElement('span');
+                span.textContent = chat.other_username;
+
+                // Додаємо текст останнього повідомлення
+                const lastMessage = document.createElement('span');
+                lastMessage.classList.add('last-message');
+                lastMessage.textContent = chat.last_message_content || "No messages yet";
+
+                // Форматуємо час, прибираючи секунди
+                const lastMessageTime = document.createElement('span');
+                lastMessageTime.classList.add('last-message-time');
+                const formattedTime = chat.last_message_time ? 
+                    new Date(chat.last_message_time).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : '';
+                lastMessageTime.textContent = formattedTime;
+
+                // Додаємо елементи в chatLink
+                chatLink.appendChild(span);
+                chatLink.appendChild(lastMessage);
+                chatLink.appendChild(lastMessageTime);
+                chatItem.appendChild(chatLink);
+
+                // Додаємо чат в список
+                chatList.appendChild(chatItem);
+            });
+        })
+        .catch(error => console.error('Error loading chats:', error));
+}
