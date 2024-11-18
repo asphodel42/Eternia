@@ -39,6 +39,27 @@ body {
     border-radius: 5px;
 }
 
+.dropdown {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    z-index: 10;
+}
+
+.dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #f0f0f0;
+}
+
 .chat-items {
     list-style-type: none;
     margin: 0;

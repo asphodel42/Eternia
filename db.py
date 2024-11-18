@@ -114,18 +114,39 @@ def get_user_by_email(email):
     finally:
         session.close()
 
-# Function for adding a chat
-def add_chat(user1_id, user2_id):
-    """Add a chat between two users."""
+def get_user_by_id(user_id):
+    """Отримання користувача за ID."""
     session = Session()
     try:
+        return session.query(User).filter_by(id=user_id).first()
+    except Exception as e:
+        print(f"Error retrieving user by ID: {e}")
+        return None
+    finally:
+        session.close()
+
+# Function for adding a chat
+def add_chat(user1_id, user2_id):
+    """Add a chat between two users if it doesn't exist."""
+    session = Session()
+    try:
+        # Перевіряємо, чи існує чат між двома користувачами
+        existing_chat = session.query(Chat).filter(
+            ((Chat.user1_id == user1_id) & (Chat.user2_id == user2_id)) |
+            ((Chat.user1_id == user2_id) & (Chat.user2_id == user1_id))
+        ).first()
+
+        if existing_chat:
+            return existing_chat.id  # Повертаємо ID вже існуючого чату
+
+        # Якщо чату не існує, створюємо новий
         new_chat = Chat(user1_id=user1_id, user2_id=user2_id)
         session.add(new_chat)
         session.commit()
-        return True
+        return new_chat.id
     except Exception as e:
         print(f"Error adding chat: {e}")
-        return False
+        return None
     finally:
         session.close()
 
@@ -199,6 +220,21 @@ def get_messages(chat_id):
         return messages
     except Exception as e:
         print(f"Error fetching messages: {e}")
+        return []
+    finally:
+        session.close()
+
+def search_users_by_name(query, exclude_user_id):
+    """Search for users by name, excluding the current user."""
+    session = Session()
+    try:
+        users = session.query(User).filter(
+            User.username.ilike(f"%{query}%"),  # Пошук за іменем (case-insensitive)
+            User.id != exclude_user_id  # Виключаємо поточного користувача
+        ).all()
+        return [{'id': user.id, 'username': user.username} for user in users]
+    except Exception as e:
+        print(f"Error searching users: {e}")
         return []
     finally:
         session.close()

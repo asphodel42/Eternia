@@ -1,16 +1,58 @@
-document.querySelector('.search input').addEventListener('input', function() {
-    var query = this.value.trim().toLowerCase();
-    var chatItems = document.querySelectorAll('.chat-item');
-    
-    chatItems.forEach(function(item) {
-        var chatName = item.textContent.trim().toLowerCase();
-        if (chatName.includes(query)) {
-            item.style.display = '';
-        } else {
-            item.style.display = 'none';
-        }
-    });
+document.querySelector('.search input').addEventListener('input', function () {
+    var query = this.value.trim();
+    if (query) {
+        fetch(`/search_users?query=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(users => {
+                updateSearchDropdown(users);
+            })
+            .catch(error => console.error('Error searching users:', error));
+    } else {
+        clearSearchDropdown();
+    }
 });
+
+function updateSearchDropdown(users) {
+    const dropdown = document.getElementById('user-search-dropdown');
+    dropdown.innerHTML = ''; // Очищаємо випадайку
+
+    users.forEach(user => {
+        const item = document.createElement('div');
+        item.textContent = user.username;
+        item.classList.add('dropdown-item');
+        item.addEventListener('click', function () {
+            createChat(user.id);
+        });
+        dropdown.appendChild(item);
+    });
+
+    dropdown.style.display = users.length ? 'block' : 'none';
+}
+
+function clearSearchDropdown() {
+    const dropdown = document.getElementById('user-search-dropdown');
+    dropdown.innerHTML = '';
+    dropdown.style.display = 'none';
+}
+
+function createChat(targetUserId) {
+    fetch('/create_chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ target_user_id: targetUserId }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.chat_id) {
+                window.location.href = `/chats?chat_id=${data.chat_id}`; // Переходимо до нового чату
+            } else {
+                alert('Failed to create chat');
+            }
+        })
+        .catch(error => console.error('Error creating chat:', error));
+}
 
 function scrollToBottom() {
     const messageContainer = document.querySelector('.chat-messages');
@@ -89,3 +131,26 @@ socket.on('new_message', function (data) {
     }
 });
 
+socket.on('new_chat', function (data) {
+    console.log('New chat received', data);
+
+    if (data.chat_id && data.other_username) {
+        const chatItem = document.createElement('li');
+        chatItem.classList.add('chat-item');
+
+        const chatLink = document.createElement('a');
+        chatLink.href = `/chats?chat_id=${data.chat_id}`;
+        chatLink.classList.add('chat-link');
+
+        const span = document.createElement('span');
+        span.textContent = data.other_username;
+
+        // Додаємо елемент в список
+        chatLink.appendChild(span);
+        chatItem.appendChild(chatLink);
+
+        // Додаємо новий чат в список
+        const chatList = document.querySelector('.chat-items');
+        chatList.appendChild(chatItem);
+    }
+});
