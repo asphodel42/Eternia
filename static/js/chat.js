@@ -80,7 +80,16 @@ if (selectedChatId) {
 }
 
 // Відправка повідомлення
-document.getElementById('sendButton').addEventListener('click', function () {
+document.getElementById('sendButton').addEventListener('click', sendMessage);
+
+document.getElementById('messageInput').addEventListener('keydown', function (event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault(); // Запобігає додаванню нового рядка
+        sendMessage();
+    }
+});
+
+function sendMessage() {
     const messageInput = document.getElementById('messageInput');
     const messageText = messageInput.value.trim();
 
@@ -105,7 +114,7 @@ document.getElementById('sendButton').addEventListener('click', function () {
         })
         .catch(error => console.error('Error:', error));
     }
-});
+}
 
 // Отримання нових повідомлень
 socket.on('new_message', function (data) {
