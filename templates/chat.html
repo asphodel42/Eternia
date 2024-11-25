@@ -32,9 +32,9 @@
 
         <!-- Центральна і права частина: Вікно чату -->
         <div class="chat-window">
+            <div id="userId" data-user-id="{{ session['user_id'] }}"></div>
             {% if selected_chat %}
                 <!-- Додаємо атрибут для user_id -->
-                <div id="userId" data-user-id="{{ session['user_id'] }}"></div>
                 <div id="chat-data" data-chat-id="{{ selected_chat.id }}"></div>
                 <div class="chat-header">
                     <div class="chat-header-left">
@@ -55,7 +55,6 @@
                     <button id="sendButton" class="send-btn">Send</button>
                 </div>
             {% else %}
-                <p>Select a chat to start messaging.</p>
             {% endif %}
         </div>
     </div>

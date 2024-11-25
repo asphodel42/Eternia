@@ -14,22 +14,8 @@ var currentUserId = document.getElementById('userId').getAttribute('data-user-id
 
 if (selectedChatId) {
     socket.emit('join', { chat_id: selectedChatId });
-}
-
-// Sending message
-document.getElementById('sendButton').addEventListener('click', sendMessage);
-
-document.getElementById('messageInput').addEventListener('keydown', function (event) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
-        sendMessage();
-    }
-});
-
-// Scroll chat to bottom function
-function scrollToBottom() {
-    const messageContainer = document.querySelector('.chat-messages');
-    messageContainer.scrollTop = messageContainer.scrollHeight;
+} else {
+    console.log('No chat selected, but search still works.');
 }
 
 // ~~~ Seach user functions ~~~
@@ -63,17 +49,36 @@ function updateSearchDropdown(users) {
 // Search fetch request
 document.querySelector('.search input').addEventListener('input', function () {
     var query = this.value.trim();
+    console.log("Test");
     if (query) {
         fetch(`/search_users?query=${encodeURIComponent(query)}`)
             .then(response => response.json())
             .then(users => {
                 updateSearchDropdown(users);
+                console.log("Done")
             })
             .catch(error => console.error('Error searching users:', error));
     } else {
         clearSearchDropdown();
     }
 });
+
+// Sending message
+document.getElementById('sendButton').addEventListener('click', sendMessage);
+
+document.getElementById('messageInput').addEventListener('keydown', function (event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+    }
+});
+
+// Scroll chat to bottom function
+function scrollToBottom() {
+    const messageContainer = document.querySelector('.chat-messages');
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+}
+
 
 // Post request to create new chat
 function createChat(targetUserId) {

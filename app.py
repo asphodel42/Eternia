@@ -65,7 +65,7 @@ def chats():
     if chat_id:
         selected_chat = get_chat_by_id(chat_id, user_id)
 
-    return render_template('chat.html', username=username, chats=chats, selected_chat=selected_chat)
+    return render_template('chat.html', user_id=user_id, username=username, chats=chats, selected_chat=selected_chat)
 
 # Selected chat route
 @app.route('/chat/<int:chat_id>', methods=['GET'])
