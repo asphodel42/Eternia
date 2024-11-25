@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from flask_socketio import SocketIO, emit, join_room
+from flask_socketio import SocketIO, join_room
 from db import init_db, create_user, verify_user_credentials, get_user_by_email, get_user_by_id, get_chats, add_message, get_messages, get_chat_by_id, add_chat, search_users_by_name
 from datetime import datetime
 
@@ -106,16 +106,23 @@ def send_message():
         return {'error': 'Invalid data'}, 400
 
     user_id = session['user_id']
-    timestamp = datetime.now()  # Час відправки повідомлення
+    timestamp = datetime.now()
     add_message(user_id, chat_id, message_text)
 
-    # Надіслати повідомлення всім у чаті, включаючи час
+    # Оновлюємо інформацію в списку чатів
+    socketio.emit('update_chat', {
+        'chat_id': chat_id,
+        'last_message_content': message_text,
+        'last_message_time': timestamp.strftime('%H:%M')
+    }, room=f"chat_{chat_id}")
+
+    # Надсилаємо нове повідомлення у кімнату чату
     socketio.emit('new_message', {
-        'chat_id': chat_id, 
-        'message': message_text, 
+        'chat_id': chat_id,
+        'message': message_text,
         'timestamp': timestamp.strftime('%H:%M'),
         'sender_id': user_id
-    }, room=f'chat_{chat_id}')
+    }, room=f"chat_{chat_id}")
 
     return {'success': True}, 200
 
@@ -129,8 +136,12 @@ def on_join(data):
 def handle_connect():
     user_id = session.get('user_id')  # Отримуємо ID користувача
     if user_id:
+        # Додаємо користувача до всіх його чатів
+        user_chats = get_chats(user_id)
+        for chat in user_chats:
+            join_room(f"chat_{chat.id}")
         join_room(f"user_{user_id}")
-        print(f"User {user_id} connected and joined the room")
+        print(f"User {user_id} connected and joined their rooms")
 
 @app.route('/search_users', methods=['GET'])
 def search_users():

@@ -175,7 +175,25 @@ socket.on('new_chat', function (data) {
         loadChats();
     }
 });
+// Update chat list when a new message is received
+socket.on('update_chat', function (data) {
+    const chatList = document.querySelector('.chat-items');
+    const chatListItem = document.querySelector(`[data-chat-id="${data.chat_id}"]`);
+    if (chatListItem) {
+        // Update last message text
+        const lastMessage = chatListItem.querySelector('.last-message');
+        const lastMessageTime = chatListItem.querySelector('.last-message-time');
 
+        lastMessage.textContent = data.last_message_content;
+        lastMessageTime.textContent = data.last_message_time;
+        // Move chat first in list
+        chatList.prepend(chatListItem);
+
+    } else {
+        // If no chat update all chats
+        loadChats();
+    }
+});
 // Load chat list
 function loadChats() {
     fetch('/api/chats')
