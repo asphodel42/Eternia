@@ -225,8 +225,10 @@ function loadChats() {
                 const lastMessageTime = document.createElement('span');
                 lastMessageTime.classList.add('last-message-time');
                 const formattedTime = chat.last_message_time ? 
-                    new Date(chat.last_message_time).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : '';
+                    new Date(chat.last_message_time).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', hour12: false,  timeZone: 'UTC'}) : '';
                 lastMessageTime.textContent = formattedTime;
+                console.log(chat.last_message_time)
+                console.log(formattedTime)
 
                 chatLink.appendChild(span);
                 chatLink.appendChild(lastMessage);

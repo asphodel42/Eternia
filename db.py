@@ -60,7 +60,7 @@ class Message(Base):
     chat_id = Column(Integer, ForeignKey('chats.id'), nullable=False)
     sender_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     content = Column(String(500), nullable=False)
-    timestamp = Column(DateTime, default=datetime.utcnow())
+    timestamp = Column(DateTime, default=datetime.now())
 
     def __init__(self, chat_id, sender_id, content):
         self.chat_id = chat_id

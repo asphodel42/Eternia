@@ -111,7 +111,7 @@ def send_message():
         return {'error': 'Invalid data'}, 400
 
     user_id = session['user_id']
-    timestamp = datetime.utcnow()
+    timestamp = datetime.now()
     add_message(user_id, chat_id, message_text)
 
     # Оновлюємо інформацію в списку чатів
