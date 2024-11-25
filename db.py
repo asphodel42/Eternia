@@ -4,18 +4,20 @@ from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateT
 from sqlalchemy.orm import relationship, sessionmaker, joinedload
 from datetime import datetime
 
-# Ініціалізація об'єктів SQLAlchemy та Bcrypt
+# Initializing objects SQLAlchemy and Bcrypt
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 
-# Налаштування бази даних
+# Setting database
 DATABASE_URL = "mysql+pymysql://asphodel:42@localhost/eternia_db"
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 
 Base = db.Model 
 
+# ~~~ Database models
 class User(Base):
+    """User model"""
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -36,6 +38,7 @@ class User(Base):
         return bcrypt.check_password_hash(self.password, password)  # Перевірка пароля
 
 class Chat(Base):
+    """Chat model"""
     __tablename__ = 'chats'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -50,13 +53,14 @@ class Chat(Base):
         self.user2_id = user2_id
 
 class Message(Base):
+    """Message model"""
     __tablename__ = 'messages'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     chat_id = Column(Integer, ForeignKey('chats.id'), nullable=False)
     sender_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     content = Column(String(500), nullable=False)
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    timestamp = Column(DateTime, default=datetime.utcnow())
 
     def __init__(self, chat_id, sender_id, content):
         self.chat_id = chat_id
@@ -102,7 +106,7 @@ def verify_user_credentials(email, password):
         session.close()
 
 def get_user_by_email(email):
-    """Отримує користувача за його email."""
+    """Getting user by email."""
     session = Session()
     try:
         # Отримуємо користувача по email
@@ -115,7 +119,7 @@ def get_user_by_email(email):
         session.close()
 
 def get_user_by_id(user_id):
-    """Отримання користувача за ID."""
+    """Getting user by id."""
     session = Session()
     try:
         return session.query(User).filter_by(id=user_id).first()
@@ -130,16 +134,16 @@ def add_chat(user1_id, user2_id):
     """Add a chat between two users if it doesn't exist."""
     session = Session()
     try:
-        # Перевіряємо, чи існує чат між двома користувачами
+        # Check if the chat already exists
         existing_chat = session.query(Chat).filter(
             ((Chat.user1_id == user1_id) & (Chat.user2_id == user2_id)) |
             ((Chat.user1_id == user2_id) & (Chat.user2_id == user1_id))
         ).first()
 
         if existing_chat:
-            return existing_chat.id  # Повертаємо ID вже існуючого чату
+            return existing_chat.id
 
-        # Якщо чату не існує, створюємо новий
+        # Create a new chat
         new_chat = Chat(user1_id=user1_id, user2_id=user2_id)
         session.add(new_chat)
         session.commit()
@@ -171,12 +175,12 @@ def get_chats(user_id):
     """Get all chats for a user and include the username of the other user, sorted by the last message timestamp."""
     session = Session()
     try:
-        # Отримуємо всі чати для користувача
+        # Getting all chats for the user
         chats = session.query(Chat).filter(
             (Chat.user1_id == user_id) | (Chat.user2_id == user_id)
         ).all()
         
-        # Додаємо username другого користувача до кожного чату
+        # Adding another user's username
         for chat in chats:
             if chat.user1_id != user_id:
                 chat.other_username = session.query(User.username).filter(User.id == chat.user1_id).first().username
@@ -193,7 +197,7 @@ def get_chats(user_id):
                 chat.last_message_time = None
                 chat.last_message_content = None
 
-        # Сортуємо чати за часом останнього повідомлення (від найновіших до найстаріших)
+        # Sorting chats by last message timestamp
         sorted_chats = sorted(chats, key=lambda chat: chat.last_message_time if chat.last_message_time else datetime.min, reverse=True)
 
         return sorted_chats
@@ -207,16 +211,14 @@ def get_chat_by_id(chat_id, current_user_id):
     """Get a chat by ID and include the username of the other user."""
     session = Session()
     try:
-        # Використовуємо joinedload для підвантаження повідомлень
+        # Using joinedload to eagerly load the messages
         chat = session.query(Chat).filter(Chat.id == chat_id).options(joinedload(Chat.messages)).first()
         if chat:
-            # Визначаємо ID іншого користувача
             other_user_id = chat.user1_id if chat.user2_id == current_user_id else chat.user2_id
             
-            # Отримуємо username іншого користувача
             other_user = session.query(User).filter(User.id == other_user_id).first()
             if other_user:
-                chat.other_username = other_user.username  # Додаємо username співрозмовника до об'єкта chat
+                chat.other_username = other_user.username
             
         return chat
     except Exception as e:
@@ -244,8 +246,8 @@ def search_users_by_name(query, exclude_user_id):
     session = Session()
     try:
         users = session.query(User).filter(
-            User.username.ilike(f"%{query}%"),  # Пошук за іменем (case-insensitive)
-            User.id != exclude_user_id  # Виключаємо поточного користувача
+            User.username.ilike(f"%{query}%"),
+            User.id != exclude_user_id
         ).all()
         return [{'id': user.id, 'username': user.username} for user in users]
     except Exception as e:
