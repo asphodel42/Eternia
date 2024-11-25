@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_socketio import SocketIO, join_room
-from db import init_db, create_user, verify_user_credentials, get_user_by_email, get_user_by_id, get_chats, add_message, get_messages, get_chat_by_id, add_chat, search_users_by_name
+from db import (init_db, create_user, verify_user_credentials, get_user_by_email,
+                get_user_by_id, get_chats, add_message, get_messages,
+                get_chat_by_id, add_chat, search_users_by_name)
 from datetime import datetime
 
 app = Flask(__name__)
