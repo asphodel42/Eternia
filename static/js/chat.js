@@ -219,16 +219,18 @@ function loadChats() {
                 // Adding last message text
                 const lastMessage = document.createElement('span');
                 lastMessage.classList.add('last-message');
-                lastMessage.textContent = chat.last_message_content || "No messages yet";
+
+                // Limit message length to 50 characters and add "..." if needed
+                const messageText = chat.last_message_content || "No messages yet";
+                const truncatedMessage = messageText.length > 10 ? messageText.substring(0, 10) + '...' : messageText;
+                lastMessage.textContent = truncatedMessage;
 
                 // Formatting time
                 const lastMessageTime = document.createElement('span');
                 lastMessageTime.classList.add('last-message-time');
                 const formattedTime = chat.last_message_time ? 
-                    new Date(chat.last_message_time).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', hour12: false,  timeZone: 'UTC'}) : '';
+                    new Date(chat.last_message_time).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC'}) : '';
                 lastMessageTime.textContent = formattedTime;
-                console.log(chat.last_message_time)
-                console.log(formattedTime)
 
                 chatLink.appendChild(span);
                 chatLink.appendChild(lastMessage);
