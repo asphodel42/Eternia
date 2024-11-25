@@ -1,23 +1,49 @@
-// Завантажуємо чати при завантаженні сторінки
+// Connetcting to WebSocket
+const socket = io.connect(window.location.origin);
+// Load chats after loading page
 document.addEventListener('DOMContentLoaded', loadChats);
+// Calling up the scroll after all messages are loaded
+document.addEventListener('DOMContentLoaded', function() {
+    scrollToBottom();
+});
 
-document.querySelector('.search input').addEventListener('input', function () {
-    var query = this.value.trim();
-    if (query) {
-        fetch(`/search_users?query=${encodeURIComponent(query)}`)
-            .then(response => response.json())
-            .then(users => {
-                updateSearchDropdown(users);
-            })
-            .catch(error => console.error('Error searching users:', error));
-    } else {
-        clearSearchDropdown();
+// Connect to a specific room (chat)
+var chatDataElement = document.getElementById('chat-data');
+var selectedChatId = chatDataElement ? parseInt(chatDataElement.getAttribute('data-chat-id'), 10) : null;
+var currentUserId = document.getElementById('userId').getAttribute('data-user-id');
+
+if (selectedChatId) {
+    socket.emit('join', { chat_id: selectedChatId });
+}
+
+// Sending message
+document.getElementById('sendButton').addEventListener('click', sendMessage);
+
+document.getElementById('messageInput').addEventListener('keydown', function (event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
     }
 });
 
+// Scroll chat to bottom function
+function scrollToBottom() {
+    const messageContainer = document.querySelector('.chat-messages');
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+}
+
+// ~~~ Seach user functions ~~~
+
+// Clear the search dropdown
+function clearSearchDropdown() {
+    const dropdown = document.getElementById('user-search-dropdown');
+    dropdown.innerHTML = '';
+    dropdown.style.display = 'none';
+}
+// Adding new users to search dropdown
 function updateSearchDropdown(users) {
     const dropdown = document.getElementById('user-search-dropdown');
-    dropdown.innerHTML = ''; // Очищаємо випадайку
+    dropdown.innerHTML = '';
 
     users.forEach(user => {
         const item = document.createElement('div');
@@ -32,12 +58,24 @@ function updateSearchDropdown(users) {
     dropdown.style.display = users.length ? 'block' : 'none';
 }
 
-function clearSearchDropdown() {
-    const dropdown = document.getElementById('user-search-dropdown');
-    dropdown.innerHTML = '';
-    dropdown.style.display = 'none';
-}
+// ~~~ Requests to server~~~
 
+// Search fetch request
+document.querySelector('.search input').addEventListener('input', function () {
+    var query = this.value.trim();
+    if (query) {
+        fetch(`/search_users?query=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(users => {
+                updateSearchDropdown(users);
+            })
+            .catch(error => console.error('Error searching users:', error));
+    } else {
+        clearSearchDropdown();
+    }
+});
+
+// Post request to create new chat
 function createChat(targetUserId) {
     fetch('/create_chat', {
         method: 'POST',
@@ -49,7 +87,7 @@ function createChat(targetUserId) {
         .then(response => response.json())
         .then(data => {
             if (data.chat_id) {
-                window.location.href = `/chats?chat_id=${data.chat_id}`; // Переходимо до нового чату
+                window.location.href = `/chats?chat_id=${data.chat_id}`;
             } else {
                 alert('Failed to create chat');
             }
@@ -57,38 +95,7 @@ function createChat(targetUserId) {
         .catch(error => console.error('Error creating chat:', error));
 }
 
-function scrollToBottom() {
-    const messageContainer = document.querySelector('.chat-messages');
-    messageContainer.scrollTop = messageContainer.scrollHeight;
-}
-
-// Викликаємо прокрутку після того, як всі повідомлення завантажено
-document.addEventListener('DOMContentLoaded', function() {
-    scrollToBottom();
-});
-
-// Підключення до WebSocket
-const socket = io.connect(window.location.origin);
-
-// Підключення до конкретної кімнати (чату)
-var chatDataElement = document.getElementById('chat-data');
-var selectedChatId = chatDataElement ? parseInt(chatDataElement.getAttribute('data-chat-id'), 10) : null;
-var currentUserId = document.getElementById('userId').getAttribute('data-user-id');
-
-if (selectedChatId) {
-    socket.emit('join', { chat_id: selectedChatId });
-}
-
-// Відправка повідомлення
-document.getElementById('sendButton').addEventListener('click', sendMessage);
-
-document.getElementById('messageInput').addEventListener('keydown', function (event) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault(); // Запобігає додаванню нового рядка
-        sendMessage();
-    }
-});
-
+// Post request to send message
 function sendMessage() {
     const messageInput = document.getElementById('messageInput');
     const messageText = messageInput.value.trim();
@@ -116,7 +123,7 @@ function sendMessage() {
     }
 }
 
-// Отримання нових повідомлень
+// Get new message using socketio
 socket.on('new_message', function (data) {
     if (data.chat_id == selectedChatId) {
         const chatMessages = document.querySelector('.chat-messages');
@@ -145,6 +152,7 @@ socket.on('new_message', function (data) {
     }
 });
 
+// Get new chat using socketio
 socket.on('new_chat', function (data) {
     if (data.chat_id && data.other_username) {
         const chatItem = document.createElement('li');
@@ -168,19 +176,20 @@ socket.on('new_chat', function (data) {
     }
 });
 
+// Load chat list
 function loadChats() {
-    fetch('/api/chats')  // Запит до нового API маршруту
+    fetch('/api/chats')
         .then(response => response.json())
         .then(data => {
             const chats = data.chats;
             const chatList = document.querySelector('.chat-items');
-            chatList.innerHTML = '';  // Очищаємо список чатів
+            chatList.innerHTML = '';
 
-            // Додаємо чати в список
+            // Adding chats to list
             chats.forEach(chat => {
                 const chatItem = document.createElement('li');
                 chatItem.classList.add('chat-item');
-                chatItem.dataset.chatId = chat.id;  // Зберігаємо chat id в атрибуті
+                chatItem.dataset.chatId = chat.id;
 
                 const chatLink = document.createElement('a');
                 chatLink.href = `/chats?chat_id=${chat.id}`;
@@ -189,25 +198,23 @@ function loadChats() {
                 const span = document.createElement('span');
                 span.textContent = chat.other_username;
 
-                // Додаємо текст останнього повідомлення
+                // Adding last message text
                 const lastMessage = document.createElement('span');
                 lastMessage.classList.add('last-message');
                 lastMessage.textContent = chat.last_message_content || "No messages yet";
 
-                // Форматуємо час, прибираючи секунди
+                // Formatting time
                 const lastMessageTime = document.createElement('span');
                 lastMessageTime.classList.add('last-message-time');
                 const formattedTime = chat.last_message_time ? 
                     new Date(chat.last_message_time).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : '';
                 lastMessageTime.textContent = formattedTime;
 
-                // Додаємо елементи в chatLink
                 chatLink.appendChild(span);
                 chatLink.appendChild(lastMessage);
                 chatLink.appendChild(lastMessageTime);
                 chatItem.appendChild(chatLink);
 
-                // Додаємо чат в список
                 chatList.appendChild(chatItem);
             });
         })
