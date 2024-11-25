@@ -7,12 +7,14 @@ app = Flask(__name__)
 app.secret_key = 'c5f1b80dc09eec32d894056b983790d5eeeb1338f07c9334c8cd57a67932726a'
 socketio = SocketIO(app)
 
+# ~~~ Flask routes ~~~
 @app.route('/')
 def index():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     return redirect(url_for('chats'))
 
+# Register route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -28,6 +30,7 @@ def register():
     
     return render_template('register.html')
 
+# Loging route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -45,6 +48,7 @@ def login():
 
     return render_template('login.html')
 
+# Chat route
 @app.route('/chats')
 def chats():
     if 'user_id' not in session:
@@ -61,7 +65,7 @@ def chats():
 
     return render_template('chat.html', username=username, chats=chats, selected_chat=selected_chat)
 
-
+# Selected chat route
 @app.route('/chat/<int:chat_id>', methods=['GET'])
 def chat(chat_id):
     if 'user_id' not in session:
@@ -73,19 +77,17 @@ def chat(chat_id):
 
     return render_template('chat.html', chat=chat, messages=messages, chats=get_chats(user_id))
 
+# API endpoint to fetch all chats of the logged-in user, 
+# including the latest message and its timestamp.
 @app.route('/api/chats', methods=['GET'])
 def api_chats():
     if 'user_id' not in session:
         return jsonify({'error': 'User not logged in'}), 403
-    
     user_id = session['user_id']
-    
-    # Отримуємо чати користувача, включаючи останнє повідомлення
     chats = get_chats(user_id)
-
-    # Формуємо дані для відповіді
+    # Froming data to respond
     chats_data = [{
-        'id': chat.id,  # Замість chat['id'] використовуємо chat.id
+        'id': chat.id,
         'other_username': chat.other_username,
         'last_message_content': chat.last_message_content,
         'last_message_time': chat.last_message_time,
@@ -93,6 +95,7 @@ def api_chats():
 
     return jsonify({'chats': chats_data})
 
+# Send message respond
 @app.route('/send_message', methods=['POST'])
 def send_message():
     if 'user_id' not in session:
@@ -134,9 +137,9 @@ def on_join(data):
 
 @socketio.on('connect')
 def handle_connect():
-    user_id = session.get('user_id')  # Отримуємо ID користувача
+    user_id = session.get('user_id')
     if user_id:
-        # Додаємо користувача до всіх його чатів
+        # Adding user to all his chats
         user_chats = get_chats(user_id)
         for chat in user_chats:
             join_room(f"chat_{chat.id}")
@@ -145,27 +148,27 @@ def handle_connect():
 
 @app.route('/search_users', methods=['GET'])
 def search_users():
-    """Search users by query."""
+    # Search users by query.
     query = request.args.get('query', '').strip()
     user_id = session.get('user_id')
 
     if not user_id or not query:
         return jsonify({'error': 'Invalid request'}), 400
 
-    # Використовуємо функцію пошуку
+    # Searching for user
     users = search_users_by_name(query=query, exclude_user_id=user_id)
-
     return jsonify(users), 200
 
+# Route to create a chat between two users.
 @app.route('/create_chat', methods=['POST'])
 def create_chat():
-    """Route to create a chat between two users."""
-    user_id = session.get('user_id')  # ID поточного користувача
-    target_user_id = request.json.get('target_user_id')  # ID іншого користувача
+   
+    user_id = session.get('user_id')
+    target_user_id = request.json.get('target_user_id')
     if not user_id or not target_user_id:
         return jsonify({'error': 'Missing user IDs'}), 400
 
-    # Використовуємо функцію add_chat для створення або пошуку чату
+    # Use the add_chat function to create or search for a chat
     chat_id = add_chat(user1_id=user_id, user2_id=target_user_id)
 
     if chat_id:
@@ -177,7 +180,7 @@ def create_chat():
             'chat_id': chat_id,
             'other_username': get_user_by_id(user_id).username
         }, room=f"user_{target_user_id}")
-        return jsonify({'chat_id': chat_id}), 201  # Успішно створено або знайдено
+        return jsonify({'chat_id': chat_id}), 201
     else:
         return jsonify({'error': 'Failed to create chat'}), 500
 
