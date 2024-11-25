@@ -62,10 +62,11 @@ class Message(Base):
     content = Column(String(500), nullable=False)
     timestamp = Column(DateTime, default=datetime.now())
 
-    def __init__(self, chat_id, sender_id, content):
+    def __init__(self, chat_id, sender_id, content, timestamp):
         self.chat_id = chat_id
         self.sender_id = sender_id
         self.content = content
+        self.timestamp = timestamp
 
 def init_db():
     """Initializes the database and creates tables."""
@@ -156,11 +157,11 @@ def add_chat(user1_id, user2_id):
 
 
 # Function to add a message to the chat
-def add_message(user_id, chat_id, text):
+def add_message(user_id, chat_id, text, timestamp):
     """Add a message to the database."""
     session = Session()
     try:
-        message = Message(sender_id=user_id, chat_id=chat_id, content=text)
+        message = Message(sender_id=user_id, chat_id=chat_id, content=text, timestamp=timestamp)
         session.add(message)
         session.commit()
     except Exception as e:

@@ -112,7 +112,7 @@ def send_message():
 
     user_id = session['user_id']
     timestamp = datetime.now()
-    add_message(user_id, chat_id, message_text)
+    add_message(user_id, chat_id, message_text, timestamp)
 
     # Оновлюємо інформацію в списку чатів
     socketio.emit('update_chat', {
