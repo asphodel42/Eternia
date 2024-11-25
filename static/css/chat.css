@@ -3,7 +3,6 @@
     padding: 0;
     box-sizing: border-box;
 }
-
 body {
     font-family: Arial, sans-serif;
     background-color: #f5f5f5;
@@ -12,7 +11,6 @@ body {
     align-items: flex-start;
     height: 100vh;
 }
-
 .chat-container {
     display: flex;
     width: 100%;
@@ -21,7 +19,6 @@ body {
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
-
 .chat-list {
     width: 300px;
     border-right: 1px solid #ddd;
@@ -30,7 +27,6 @@ body {
     padding: 10px;
     position: relative;
 }
-
 .search input {
     width: 100%;
     padding: 8px;
@@ -38,7 +34,6 @@ body {
     border: 1px solid #ddd;
     border-radius: 5px;
 }
-
 .dropdown {
     display: none;
     position: absolute;
@@ -50,22 +45,18 @@ body {
     width: 100%;
     z-index: 10;
 }
-
 .dropdown-item {
     padding: 10px;
     cursor: pointer;
 }
-
 .dropdown-item:hover {
     background-color: #f0f0f0;
 }
-
 .chat-items {
     list-style-type: none;
     margin: 0;
     padding: 0;
 }
-
 .chat-item {
     padding: 10px;
     margin-bottom: 10px;
@@ -73,11 +64,9 @@ body {
     cursor: pointer;
     transition: background-color 0.3s;
 }
-
 .chat-item:hover {
     background-color: #f0f0f0;
 }
-
 .chat-link {
     display: block;
     padding: 10px;
@@ -87,17 +76,14 @@ body {
     color: #333;
     transition: background-color 0.3s ease;
 }
-
 .chat-link:hover {
-    background-color: #e0e0e0; /* Колір при наведенні */
+    background-color: #e0e0e0;
 }
-
 .chat-window {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
-
 .chat-header {
     display: flex;
     justify-content: space-between;
@@ -107,25 +93,21 @@ body {
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
 }
-
 .chat-header-left .username {
     font-weight: bold;
     font-size: 18px;
 }
-
 .chat-header-right .profile-link {
     font-size: 14px;
     color: #575c62;
     cursor: pointer;
     text-decoration: none;
-  }
-
+}
 .chat-messages {
     flex-grow: 1;
     padding: 10px 20px;
     overflow-y: auto;
 }
-
 .message {
     max-width: 70%;
     width: fit-content;
@@ -133,18 +115,15 @@ body {
     border-radius: 5px;
     margin-bottom: 10px;
 }
-
 .message.received {
     background-color: #f0f0f0;
     align-self: flex-start;
 }
-
 .message.sent {
     background-color: #007bff;
     color: #fff;
     align-self: flex-end;
 }
-
 .message.sent .message-time {
     font-size: 11px;
     color: #a0f4f4;
@@ -152,7 +131,6 @@ body {
     top: 5px;
     position: relative;
 }
-
 .message.received .message-time {
     font-size: 11px;
     color: #2d4242;
@@ -160,14 +138,12 @@ body {
     top: 5px;
     position: relative;
 }
-
 .chat-input {
     display: flex;
     padding: 10px 20px;
     border-top: 1px solid #ddd;
     background-color: #f9f9f9;
 }
-
 .chat-input textarea {
     flex-grow: 1;
     padding: 10px;
@@ -176,7 +152,6 @@ body {
     font-size: 14px;
     resize: none;
 }
-
 .chat-input button {
     padding: 10px 15px;
     margin-left: 10px;
@@ -186,12 +161,9 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
-
 .chat-input button:hover {
     background-color: #0056b3;
 }
-
-/* Профіль користувача (ліво внизу) */
 .user-profile {
     position: absolute;
     bottom: 20px;
@@ -203,32 +175,19 @@ body {
     border-radius: 50px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-
-/* .profile-img img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 10px;
-} */
-
 .profile-info h4 {
     font-size: 16px;
     font-weight: bold;
 }
-
 .profile-info p {
     font-size: 12px;
     color: #777;
 }
-
-/* Стилі для списку чатів */
 .chat-items {
     list-style-type: none;
     padding: 0;
     margin: 0;
 }
-
-/* Стиль для кожного елемента чату */
 .chat-item {
     display: flex;
     align-items: center;
@@ -236,13 +195,9 @@ body {
     border-bottom: 1px solid #ddd;
     transition: background-color 0.3s;
 }
-
-/* Колір при наведенні */
 .chat-item:hover {
     background-color: #f1f1f1;
 }
-
-/* Стиль для посилання на чат */
 .chat-link {
     flex-grow: 1;
     text-decoration: none;
@@ -251,22 +206,16 @@ body {
     justify-content: space-between;
     align-items: center;
 }
-
-/* Стиль для імені користувача */
 .chat-link span {
     font-weight: bold;
     margin-right: 10px;
 }
-
-/* Стиль для останнього повідомлення */
 .last-message {
     font-size: 0.9em;
     color: #666;
     flex-grow: 2;
     padding-right: 10px;
 }
-
-/* Стиль для часу останнього повідомлення */
 .last-message-time {
     font-size: 0.8em;
     color: #999;

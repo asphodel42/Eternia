@@ -3,14 +3,10 @@
     padding: 0;
     box-sizing: border-box;
 }
-
-/* Загальні стилі */
 body {
     font-family: 'Arial', sans-serif;
     color: #333;
 }
-
-/* Блок входу */
 .login-block {
     display: flex;
     flex-direction: column;
@@ -22,21 +18,16 @@ body {
     padding: 20px;
     width: 100%;
 }
-
-/* Заголовок форми */
 .login-header {
     font-size: 24px;
     font-weight: bold;
     color: #007bff; 
     margin-bottom: 20px;
 }
-
 .login-form{
     display: flex;
     flex-direction: column;
 }
-
-/* Форма */
 .login-form > form {
     display: flex;
     flex-direction: column;
@@ -45,8 +36,6 @@ body {
     gap: 15px;
     width: 100%;
 }
-
-/* Поля вводу */
 .login-form input {
     padding: 10px;
     font-size: 16px;
@@ -54,8 +43,6 @@ body {
     border-radius: 5px;
     outline: none;
 }
-
-/* Кнопка */
 .login-form button {
     padding: 12px;
     font-size: 16px;
@@ -65,8 +52,6 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
-
-/* Лінк для переходу на сторінку реєстрації */
 .login-form .register-link {
     text-align: center;
     font-size: 14px;
@@ -74,11 +59,9 @@ body {
     text-decoration: none;
     margin-top: 10px;
 }
-
 .login-form .register-link:hover {
     text-decoration: underline;
 }
-
 .flashes {
     position: absolute;
     width: 100%;
@@ -86,20 +69,17 @@ body {
     padding: 0;
     margin: 0 0 10px 0;
 }
-
 .flashes li {
     padding: 10px;
     margin-bottom: 10px;
     border-radius: 5px;
     font-size: 14px;
 }
-
 .flashes .success {
     background-color: #d4edda;
     color: #155724;
     border: 1px solid #c3e6cb;
 }
-
 .flashes .danger {
     background-color: #f8d7da;
     color: #721c24;
