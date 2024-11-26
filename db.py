@@ -32,10 +32,10 @@ class User(Base):
     def __init__(self, username, email, password):
         self.username = username
         self.email = email
-        self.password = bcrypt.generate_password_hash(password).decode('utf-8')  # Хешуємо пароль
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def check_password(self, password):
-        return bcrypt.check_password_hash(self.password, password)  # Перевірка пароля
+        return bcrypt.check_password_hash(self.password, password)
 
 class Chat(Base):
     """Chat model"""
@@ -234,7 +234,6 @@ def get_messages(chat_id):
     session = Session()
     try:
         messages = session.query(Message).filter_by(chat_id=chat_id).order_by(Message.timestamp.asc()).all()
-        print(messages)
         return messages
     except Exception as e:
         print(f"Error fetching messages: {e}")
